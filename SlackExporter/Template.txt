@@ -1,0 +1,19 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <title>Slack export</title>
+  <meta name="author" content="VladD's Slack exporter">
+  <link rel="stylesheet" type="text/css" href="Styles.css">
+  <script>
+    function video_activate(self) { self.removeAttribute('onclick'); self.innerHTML = self.getAttribute("data-video-content"); }
+  </script>
+</head>
+  <body onload="PR.prettyPrint()">
+  <div class="messages">
+[CONTENT]
+  </div>
+  <script src="https://cdn.rawgit.com/google/code-prettify/master/loader/prettify.js"></script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+﻿+ <pre> style
++ Add reactions
+- Improve regexes in text beautifier (e. g. *lala.*, *ab*cd*)
+- Check the order of regex application in text beautifier
+* Find a better emoji list
++ Load team's custom emojis
++ Add file comment processing
+- Check file names in local cache in order to not escape the sandbox (security!)
++ Add message buttons
++ Display stars at starred messages 

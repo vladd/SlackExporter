@@ -1,0 +1,214 @@
+﻿body {
+  text-align: center;
+  padding: 1em;
+}
+
+.messages {
+    /* max-width: 700px; */
+    text-align: left;
+    display: inline-block;
+	padding: 0px 50px;
+}
+
+.messages .avatar {
+  background-color: rgb(248,244,240);
+  width: 36px;
+  height: 36px;
+  border-radius: 0.2em;
+  display: inline-block;
+  vertical-align: top;
+  margin-right: 0.65em;
+}
+
+.messages .imgplaceholder {
+  width: 36px;
+  display: inline-block;
+  margin-right: 0.65em;
+}
+
+.messages .container > .imgplaceholder > .hiddentime {
+  line-height: 1.2;
+  float: right;
+  color: #c8c8c8;
+  visibility: hidden;
+}
+
+.messages .container:hover > .imgplaceholder >.hiddentime {
+  visibility: visible;
+}
+
+.messages .time {
+  display: inline-block;
+  color: rgb(200, 200, 200);
+  margin-left: 0.5em;
+}
+
+.messages .container {
+  padding: 6px 0px;
+}
+
+.messages .threadcontainer, .messages .attachcontainer {
+  border-left: 5px solid rgba(0, 0, 0, 0.1);
+  padding: 0px 10px;
+  margin: 5px 0px;
+}
+
+.messages .attachcontainer {
+  line-height: 1.45;
+  max-width: 600px;
+}
+
+.messages .attachcontainer .serviceicon {
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  margin-bottom: 3px;
+  margin-right: 8px;
+}
+
+.messages .attachcontainer .servicename, .messages .attachcontainer .authorname {
+  color: #717274;
+}
+
+.messages .attachcontainer .attachtitle {
+  font-weight: 600;
+}
+
+.messages .attachcontainer .attachvideocontent {
+  text-align: center;
+  background: #f8f8f8;
+}
+
+.messages .attachcontainer .attachvideocontent .videothumb {
+  max-height: 100%;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.messages .username {
+  display: inline-block;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.messages .message {
+  display: inline-block;
+  vertical-align: top;
+  line-height: 1;
+  width: calc(100% - 3em);
+}
+
+.messages .message .msg {
+  line-height: 1.5;
+}
+
+.messages .message .simplemsg {
+    line-height: 1.2;
+}
+
+.messages .message .sysmsg {
+    color: rgb(0,32,128);
+	font-style: oblique;
+}
+
+.messages .message .video {
+	max-width: 480px;
+}
+
+.messages .message .thumb {
+}
+
+code, pre {
+  font-family: Monaco, Menlo, Consolas, "Courier New", monospace !important;
+  font-size: .75rem;
+  line-height: .75rem;
+  white-space: pre;
+  color: #d72b3f;
+  background-color: #f7f7f9;
+  padding: 2px 4px;
+  border: 1px solid #e1e1e8
+  -webkit-font-variant-ligatures: none;
+  font-variant-ligatures: none;
+  tab-size: 4;
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  -webkit-tab-size: 4;
+}
+
+/* Pretty printing styles. Used with prettify.js. */
+
+/* SPAN elements with the classes below are added by prettyprint. */
+.pln { color: #000 }  /* plain text */
+
+@media screen {
+  .str { color: #080 }  /* string content */
+  .kwd { color: #008 }  /* a keyword */
+  .com { color: #800 }  /* a comment */
+  .typ { color: #606 }  /* a type name */
+  .lit { color: #066 }  /* a literal value */
+  /* punctuation, lisp open bracket, lisp close bracket */
+  .pun, .opn, .clo { color: #660 }
+  .tag { color: #008 }  /* a markup tag name */
+  .atn { color: #606 }  /* a markup attribute name */
+  .atv { color: #080 }  /* a markup attribute value */
+  .dec, .var { color: #606 }  /* a declaration; a variable name */
+  .fun { color: red }  /* a function name */
+}
+
+/* Use higher contrast and text-weight for printable form. */
+@media print, projection {
+  .str { color: #060 }
+  .kwd { color: #006; font-weight: bold }
+  .com { color: #600; font-style: italic }
+  .typ { color: #404; font-weight: bold }
+  .lit { color: #044 }
+  .pun, .opn, .clo { color: #440 }
+  .tag { color: #006; font-weight: bold }
+  .atn { color: #404 }
+  .atv { color: #060 }
+}
+
+/* Put a border around prettyprinted code snippets. */
+pre.prettyprint {
+  padding: 0px;
+  border: 1px solid rgba(0,0,0,.1);
+  border-radius: 4px;
+  background: #fff;
+}
+
+pre.prettyprint ol.linenums {
+  margin-top: 0;
+  margin-bottom: 0;
+  counter-reset: listing;
+  list-style-type: none;
+  padding-left: 0px;
+} /* IE indents via margin-left */
+
+pre.prettyprint li::before {
+  content: counter(listing);
+  display: inline-block;
+  margin-left: auto;
+  margin-right: 5px;
+  text-align: right;
+  padding: 2px 1em;
+  background: #f9f9f9;
+  border-right: 1px solid rgba(0,0,0,.1);
+  width: 26px;
+}
+
+pre.prettyprint li {
+  counter-increment: listing;
+}
+
+.bigemoji {
+  font-size: 25px;
+}
+
+a, a:link, a:visited {
+  color: #0576b9;
+  text-decoration: none
+}
+
+a:active, a:focus, a:hover {
+  color: #005e99;
+}
