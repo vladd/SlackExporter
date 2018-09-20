@@ -19,20 +19,20 @@ namespace SlackExporter
 
         public static string BeautifyMessage(string text)
         {
-            var r1 = userref.Replace(text, match => Program.usersById[match.Groups[1].Value].displayName);
-            var r2 = chanref.Replace(r1, match => Program.channelsById[match.Groups[1].Value].name);
-            var r3 = emojiref.Replace(r2, match =>
+            text = userref.Replace(text, match => Program.usersById[match.Groups[1].Value].displayName);
+            text = chanref.Replace(text, match => Program.channelsById[match.Groups[1].Value].name);
+            text = emojiref.Replace(text, match =>
             {
                 var emoji = Program.EmojiTools.Get(match.Groups[1].Value);
-                if (match.Index == 0 && match.Length == r2.Length)
+                if (match.Index == 0 && match.Length == text.Length)
                     return $"<span class=\"bigemoji\">{emoji}</span>";
                 else
                     return emoji;
             });
-            var r4 = r3.Replace("\n", "<br>");
-            var r5 = pre.Replace(r4, match => $"<pre>{match.Groups[1].Value}</pre>");
-            var r6 = code.Replace(r5, match => $"<code>{match.Groups[1].Value}</code>");
-            var r7 = url.Replace(r6, match =>
+            text = text.Replace("\n", "<br>");
+            text = pre.Replace(text, match => $"<pre>{match.Groups[1].Value}</pre>");
+            text = code.Replace(text, match => $"<code>{match.Groups[1].Value}</code>");
+            text = url.Replace(text, match =>
             {
                 var link = match.Groups[1].Value;
                 var display = link;
@@ -46,10 +46,10 @@ namespace SlackExporter
                 }
                 return $"<a href=\"{link}\">{display}</a>";
             });
-            var r8 = italics.Replace(r7, match => $"<em>{match.Groups[1].Value}</em>");
-            var r9 = bold.Replace(r8, match => $"<strong>{match.Groups[1].Value}</strong>");
-            var r10 = strike.Replace(r9, match => $"<strike>{match.Groups[1].Value}</strike>");
-            return r10;
+            text = italics.Replace(text, match => $"<em>{match.Groups[1].Value}</em>");
+            text = bold.Replace(text, match => $"<strong>{match.Groups[1].Value}</strong>");
+            text = strike.Replace(text, match => $"<strike>{match.Groups[1].Value}</strike>");
+            return text;
         }
     }
 }
