@@ -102,19 +102,23 @@
 
 .messages .message .msg {
   line-height: 1.5;
+  width: 100%;
+  overflow: auto;
 }
 
 .messages .message .simplemsg {
-    line-height: 1.2;
+  line-height: 1.2;
+  width: 100%;
+  overflow: auto;
 }
 
 .messages .message .sysmsg {
-    color: rgb(0,32,128);
-	font-style: oblique;
+  color: rgb(0,32,128);
+  font-style: oblique;
 }
 
 .messages .message .video {
-	max-width: 480px;
+  max-width: 480px;
 }
 
 .messages .message .thumb {
@@ -135,6 +139,10 @@ code, pre {
   -moz-tab-size: 4;
   -o-tab-size: 4;
   -webkit-tab-size: 4;
+}
+
+code.softcode {
+  white-space: pre-wrap;
 }
 
 /* Pretty printing styles. Used with prettify.js. */
@@ -168,6 +176,11 @@ code, pre {
   .tag { color: #006; font-weight: bold }
   .atn { color: #404 }
   .atv { color: #060 }
+}
+
+pre.blockpre {
+  max-width: 100%;
+  overflow: auto;
 }
 
 /* Put a border around prettyprinted code snippets. */

@@ -30,8 +30,8 @@ namespace SlackExporter
                     return emoji;
             });
             text = text.Replace("\n", "<br>");
-            text = pre.Replace(text, match => $"<pre>{match.Groups[1].Value}</pre>");
-            text = code.Replace(text, match => $"<code>{match.Groups[1].Value}</code>");
+            text = pre.Replace(text, match => $"<pre class=\"blockpre\">{match.Groups[1].Value}</pre>");
+            text = code.Replace(text, match => $"<code class=\"softcode\">{match.Groups[1].Value}</code>");
             text = url.Replace(text, match =>
             {
                 var link = match.Groups[1].Value;
