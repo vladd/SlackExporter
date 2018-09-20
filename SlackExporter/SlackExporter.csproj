@@ -49,6 +49,7 @@
     <Compile Include="Channel.cs" />
     <Compile Include="EmojiTools.cs" />
     <Compile Include="ExactDateTimeOffset.cs" />
+    <Compile Include="FileContent.cs" />
     <Compile Include="MarkdownTools.cs" />
     <Compile Include="MessageGraphReader.cs" />
     <Compile Include="Messages.cs" />
@@ -60,10 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Emoji\emojis.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Emoji\compact.json">
+    <None Include="Emoji\emoji.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
