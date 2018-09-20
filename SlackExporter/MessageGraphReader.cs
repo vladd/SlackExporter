@@ -97,7 +97,11 @@ namespace SlackExporter
             case "file_comment":
                 return null; // TODO: add file comment processing too 
             case null:
-                message = new TextMessage();
+                var upload = token["upload"];
+                if (upload != null && (bool)upload)
+                    message = new UploadMessage() { files = GatherFiles(token["files"]).ToList() };
+                else
+                    message = new TextMessage();
                 break;
             case "channel_join":
                 message = new JoinMessage();
@@ -109,68 +113,8 @@ namespace SlackExporter
                 message = new ChannelNameMessage() { oldName = (string)token["old_name"], name = (string)token["name"] };
                 break;
             case "file_share":
-                var file = token["file"];
-                var mode = (string)file["mode"];
-                var name = (string)file["name"];
-                switch (mode)
-                {
-                case "hosted":
-                    var initialComment = file["initial_comment"];
-                    var mimetype = (string)file["mimetype"];
-                    var filetype = (string)file["filetype"];
-                    FileMessage fileMessage;
-                    var thumbName = Path.GetFileNameWithoutExtension(name);
-                    var thumbExt = Path.GetExtension(name);
-                    var thumbSuggestion = $"{thumbName}.thumb{thumbExt}";
-                    if (mimetype.StartsWith("image/"))
-                    {
-                        var thumbLink = (string)file["thumb_480"] ?? (string)file["thumb_360"] ?? (string)file["thumb_64"];
-                        fileMessage = new ImageMessage()
-                        {
-                            //origSize = new Size() { w = (int)file["original_w"], h = (int)file["original_h"] },
-                            thumb = Program.GenerateUri(thumbLink, thumbSuggestion, needFull: false)
-                        };
-                    }
-                    else if (mimetype == "application/pdf")
-                    {
-                        fileMessage = new AppMessage()
-                        {
-                            thumb = Program.GenerateUri((string)file["thumb_pdf"], thumbSuggestion, needFull: false)
-                        };
-                    }
-                    else if (mimetype.StartsWith("video/"))
-                    {
-                        fileMessage = new VideoMessage();
-                    }
-                    else
-                    {
-                        throw new NotSupportedException("Unsupported file mime type: " + mimetype);
-                    }
-                    fileMessage.name = name;
-                    fileMessage.link = Program.GenerateUri((string)file["url_private"], name, needFull: false);
-                    fileMessage.comment = initialComment == null ? null : (string)initialComment["comment"];
-                    fileMessage.mimeType = mimetype;
-                    fileMessage.fileType = filetype;
-                    message = fileMessage;
-                    break;
-                case "snippet":
-                    string snippet;
-                    if ((int)file["lines_more"] != 0)
-                    {
-                        var snippetUri = (string)file["url_private"];
-                        if (string.IsNullOrEmpty(name))
-                            name = "snippet";
-                        snippet = new WebClient() { Encoding = Encoding.UTF8 }.DownloadString(Program.GenerateUri(snippetUri, name, needFull: true));
-                    }
-                    else
-                    {
-                        snippet = (string)file["preview"];
-                    }
-                    message = new SnippetMessage() { snippet = snippet };
-                    break;
-                default:
-                    throw new NotImplementedException("Unknown message type: share/" + mode);
-                }
+                var fileContent = ParseFileContent(token["file"]);
+                message = new PreviewableFileMessage() { file = fileContent };
                 break;
             default:
                 throw new NotImplementedException("Unknown message type: " + subtype);
@@ -195,6 +139,76 @@ namespace SlackExporter
             return message;
         }
 
+        IEnumerable<FileContent> GatherFiles(JToken files)
+        {
+            if (!(files is JArray fileArray))
+                throw new NotSupportedException("Unsupported upload type, expected array of files");
+            return fileArray.Select(ParseFileContent);
+        }
+
+        FileContent ParseFileContent(JToken file)
+        {
+            var mode = (string)file["mode"];
+            var name = (string)file["name"];
+            switch (mode)
+            {
+            case "hosted":
+                var initialComment = file["initial_comment"];
+                var mimetype = (string)file["mimetype"];
+                var filetype = (string)file["filetype"];
+                var thumbName = Path.GetFileNameWithoutExtension(name);
+                var thumbExt = Path.GetExtension(name);
+                var thumbSuggestion = $"{thumbName}.thumb{thumbExt}";
+                FileContent content;
+                if (mimetype.StartsWith("image/"))
+                {
+                    var thumbLink = (string)file["thumb_480"] ?? (string)file["thumb_360"] ?? (string)file["thumb_64"];
+                    content = new ThumbnailedFileContent()
+                    {
+                        //origSize = new Size() { w = (int)file["original_w"], h = (int)file["original_h"] },
+                        thumb = Program.GenerateUri(thumbLink, thumbSuggestion, needFull: false)
+                    };
+                }
+                else if (mimetype == "application/pdf")
+                {
+                    content = new ThumbnailedFileContent()
+                    {
+                        thumb = Program.GenerateUri((string)file["thumb_pdf"], thumbSuggestion, needFull: false)
+                    };
+                }
+                else if (mimetype.StartsWith("video/"))
+                {
+                    content = new VideoFileContent();
+                }
+                else
+                {
+                    throw new NotSupportedException("Unsupported file mime type: " + mimetype);
+                }
+                content.name = name;
+                content.link = Program.GenerateUri((string)file["url_private"], name, needFull: false);
+                content.comment = initialComment == null ? null : (string)initialComment["comment"];
+                content.mimeType = mimetype;
+                content.fileType = filetype;
+                return content;
+            case "snippet":
+                string snippet;
+                if ((int)file["lines_more"] != 0)
+                {
+                    var snippetUri = (string)file["url_private"];
+                    if (string.IsNullOrEmpty(name))
+                        name = "snippet";
+                    snippet = new WebClient() { Encoding = Encoding.UTF8 }.DownloadString(Program.GenerateUri(snippetUri, name, needFull: true));
+                }
+                else
+                {
+                    snippet = (string)file["preview"];
+                }
+                return new SnippetFileContent { snippet = snippet };
+            default:
+                throw new NotImplementedException("Unknown message type: share/" + mode);
+            }
+        }
+
         Attachment ParseAttachment(JToken token)
         {
             Attachment attachment;
@@ -211,11 +225,13 @@ namespace SlackExporter
             }
             else
             {
-                throw new NotSupportedException("Unknown atttachment type");
+                attachment = new SimpleAttachment();
             }
 
             attachment.Title = (string)token["title"];
-            attachment.TitleLink = new Uri((string)token["title_link"]);
+            var titleLinkString = (string)token["title_link"];
+            if (titleLinkString != null)
+                attachment.TitleLink = new Uri(titleLinkString);
 
             attachment.ServiceName = (string)token["service_name"];
             if (token["service_icon"] is JToken serviceIconToken)

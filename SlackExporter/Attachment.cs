@@ -71,4 +71,9 @@ namespace SlackExporter
         public string Text;
         protected override string GetContentHtml() => $"<div class=\"attachcontent\">{Text}</div>";
     }
+
+    class SimpleAttachment : Attachment
+    {
+        protected override string GetContentHtml() => "";
+    }
 }

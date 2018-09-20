@@ -25,7 +25,7 @@ namespace SlackExporter
             InMessage(GetUsernameHtml() +
                       GetTimeHtml() +
                       GetMessageTextHtml() +
-                      GetAdditions() +
+                      GetFiles() +
                       GetAttachments() +
                       GetThread());
         protected string GetUsernameHtml() => $"<div class=\"username\">{WebUtility.HtmlEncode(author.displayName)}</div>";
@@ -33,7 +33,7 @@ namespace SlackExporter
         protected virtual string GetMessageTextHtml() => $"<div class=\"msg{GetMessageClasses()}\">{GetMessageContent()}</div>";
         protected abstract string GetMessageContent();
         protected virtual string GetMessageClasses() => "";
-        protected virtual string GetAdditions() => "";
+        protected virtual string GetFiles() => "";
 
         protected string GetAttachments()
         {
@@ -62,26 +62,28 @@ namespace SlackExporter
             return sb.ToString();
         }
 
+        static bool MessagesAreClose(TextMessage m1, TextMessage m2) =>
+            m1.author == m2.author &&
+            Math.Abs((m2.timestamp.ToStandardOffset() - m1.timestamp.ToStandardOffset()).TotalMinutes) < 5;
+
         static public void RenderMessageList(IEnumerable<Message> messages, Action<string> shipout)
         {
-            bool prevText = false;
-            User prevUser = null;
+            TextMessage prevText = null;
             foreach (var message in messages)
             {
                 if (message is TextMessage tm)
                 {
-                    if (prevText && prevUser == tm.author)
+                    if (prevText != null && MessagesAreClose(prevText, tm))
                         shipout(tm.CreateHtmlShort());
                     else
                         shipout(message.CreateHtml());
-                    prevText = true;
+                    prevText = tm;
                 }
                 else
                 {
                     shipout(message.CreateHtml());
-                    prevText = false;
+                    prevText = null;
                 }
-                prevUser = message.author;
             }
         }
 
@@ -108,44 +110,31 @@ namespace SlackExporter
                           GetAttachments() + GetThread());
     }
 
-    abstract class FileMessage : Message
+    abstract class SingleFileMessage : Message
     {
-        public Uri link;
-        //public Size origSize;
-        public string comment;
-        public string mimeType, fileType;
-        public string name;
+        public FileContent file;
     }
 
-    class PreviewableFileMessage : FileMessage
-    {
-        public Uri thumb;
-
-        protected override string GetMessageClasses() => " sysmsg";
-        protected override string GetMessageContent() => $"загрузил файл: «{name}»";
-        protected override string GetAdditions() => GetPreviewHtml();
-
-        string GetPreviewHtml() => $"<a href=\"{link.ToString()}\" target=\"_blank\"><img src=\"{thumb.ToString()}\" style=\"max-width: 480px;\"></a>";
-    }
-
-    class ImageMessage : PreviewableFileMessage { }
-
-    class AppMessage : PreviewableFileMessage { }
-
-    class VideoMessage : FileMessage
+    class PreviewableFileMessage : SingleFileMessage
     {
         protected override string GetMessageClasses() => " sysmsg";
-        protected override string GetMessageContent() => $"загрузил файл: «{name}»";
-        protected override string GetAdditions() => $"<video class=\"video\" src=\"{link.ToString()}\" controls></video>";
+        protected override string GetMessageContent() => $"загрузил файл: «{file.name}»";
+        protected override string GetFiles() => GetPreviewHtml();
+
+        string GetPreviewHtml() => file.CreateHtml();
     }
 
-    class SnippetMessage : Message
+    class SnippetMessage : SingleFileMessage
     {
-        public string snippet;
-
         protected override string GetMessageTextHtml() => "";
-        protected override string GetAdditions() => $"<pre class=\"prettyprint linenums\">{snippet}</pre>";
         protected override string GetMessageContent() => "";
+    }
+
+    class UploadMessage : Message
+    {
+        public List<FileContent> files;
+        protected override string GetMessageContent() => MarkdownTools.BeautifyMessage(text);
+        protected override string GetFiles() => string.Concat(files.Select(f => f.CreateHtml()));
     }
 
     abstract class SystemMessage : Message
