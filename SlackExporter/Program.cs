@@ -53,9 +53,7 @@ namespace SlackExporter
                 TimeZoneInfo.FindSystemTimeZoneById(args[1]) :
                 TimeZoneInfo.Local;
 
-            EmojiTools = new EmojiTools(
-                Path.Combine(selfDir, "Emoji", "compact.json"),
-                Path.Combine(selfDir, "Emoji", "emojis.json"));
+            EmojiTools = new EmojiTools(Path.Combine(selfDir, "Emoji", "emoji.json"));
             remoteCache = new RemoteCache(Path.Combine(baseDir, "cache.registry"), Path.Combine(baseDir, "Cache"));
 
             var dataImporter = new DataImporter();
